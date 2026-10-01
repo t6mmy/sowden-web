@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>31 Nights of Fright</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Rubik:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#07040d;--card:#130a22;--orange:#ff6a00;--purple:#a24bff;--blood:#d10f2c;--text:#f4eaff;--muted:#a898c8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Rubik',system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 50% -10%,#3b0b5e 0%,transparent 55%),radial-gradient(ellipse at 90% 100%,#5a1500 0%,transparent 45%),radial-gradient(ellipse at 0% 80%,#1d0840 0%,transparent 45%);background-attachment:fixed}
+.fog{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 25% at 20% 90%,rgba(170,120,255,.14),transparent),radial-gradient(ellipse 50% 22% at 80% 75%,rgba(255,106,0,.1),transparent);animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateX(7%) scale(1.1)}}
+.bat{position:fixed;font-size:26px;pointer-events:none;z-index:1;animation:fly 16s linear infinite;opacity:.8}
+.bat:nth-of-type(2){top:22%;animation-duration:22s;animation-delay:-8s;font-size:20px}
+.bat:nth-of-type(3){top:60%;animation-duration:19s;animation-delay:-13s;font-size:32px}
+@keyframes fly{0%{transform:translate(-8vw,0)}25%{transform:translate(25vw,-40px) rotate(8deg)}50%{transform:translate(55vw,25px) rotate(-6deg)}75%{transform:translate(82vw,-30px) rotate(8deg)}100%{transform:translate(110vw,0)}}
+.drips{height:46px;position:relative;z-index:2;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='46'%3E%3Cg stroke='%23d10f2c' stroke-linecap='round' fill='none'%3E%3Cpath stroke-width='10' d='M0 5H220'/%3E%3Cpath stroke-width='7' d='M22 5v22M66 5v36M104 5v14M150 5v30M192 5v20'/%3E%3C/g%3E%3C/svg%3E") repeat-x;filter:drop-shadow(0 4px 10px rgba(209,15,44,.5))}
+main{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 16px 56px}
+header{text-align:center;padding:10px 0 26px}
+h1{font-family:'Creepster','Impact',fantasy;font-weight:400;font-size:clamp(3rem,11vw,7.5rem);line-height:.95;margin:6px 0 0;letter-spacing:.04em;color:var(--orange);text-shadow:0 0 12px rgba(255,106,0,.9),0 0 40px rgba(255,106,0,.55),3px 3px 0 #5b0016;animation:flick 6s infinite}
+h1 span{display:block;color:var(--purple);font-size:.55em;text-shadow:0 0 14px rgba(162,75,255,.9),0 0 40px rgba(162,75,255,.5),2px 2px 0 #1a0033}
+@keyframes flick{0%,18%,22%,24%,54%,57%,100%{opacity:1}20%,23%,55%{opacity:.4}}
+.sub{margin:14px auto 0;max-width:34rem;color:var(--muted);font-size:1.05rem}
+.meter{max-width:560px;margin:22px auto 0}
+.bar{height:16px;border-radius:99px;background:#1d1030;border:1px solid #3c2260;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blood),var(--orange),#ffd23a);box-shadow:0 0 18px var(--orange);transition:width .5s}
+.count{margin-top:8px;font-weight:700;letter-spacing:.02em}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-top:16px;font-size:.82rem;color:var(--muted)}
+.legend b{font-weight:600;color:var(--text)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend em{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.wds{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin:8px 0 10px;text-align:center;font-family:'Creepster',fantasy;font-size:1.35rem;letter-spacing:.08em;color:var(--purple);text-shadow:0 0 10px rgba(162,75,255,.7)}
+#grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{position:relative;appearance:none;text-align:left;font:inherit;color:inherit;cursor:pointer;min-height:158px;padding:12px 12px 10px;border-radius:14px 14px 18px 18px;border:1px solid color-mix(in srgb,var(--c) 45%,#2a1646);border-top:4px solid var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 14%,var(--card)),var(--card) 70%);display:flex;flex-direction:column;gap:4px;overflow:hidden;transition:transform .2s,box-shadow .2s,opacity .3s}
+.day:hover,.day:focus-visible{transform:translateY(-5px) rotate(-.6deg);box-shadow:0 10px 30px color-mix(in srgb,var(--c) 55%,transparent),0 0 0 1px var(--c);outline:none}
+.day:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.n{font-family:'Creepster',fantasy;font-size:2.5rem;line-height:1;color:var(--c);text-shadow:0 0 14px var(--c)}
+.wd{display:none;font-size:.8rem;color:var(--muted)}
+.t{font-size:1rem;font-weight:700;line-height:1.2;margin-top:auto}
+.y{font-size:.78rem;color:var(--muted)}
+.sk{font-size:.85rem;letter-spacing:1px}
+.sk s{text-decoration:none;opacity:.14;filter:grayscale(1)}
+.stamp{display:none;position:absolute;right:6px;top:38%;transform:rotate(-14deg);border:3px solid #6dff7a;color:#6dff7a;border-radius:6px;padding:2px 8px;font-family:'Creepster',fantasy;font-size:1.2rem;letter-spacing:.08em;background:rgba(7,4,13,.7);text-shadow:0 0 8px #6dff7a;box-shadow:0 0 14px rgba(109,255,122,.5)}
+.done{opacity:.6;filter:saturate(.55)}
+.done .stamp{display:block}
+.today{animation:pulse 1.8s ease-in-out infinite}
+.today::after{content:'TONIGHT';position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:700;letter-spacing:.12em;background:var(--orange);color:#1a0a00;padding:2px 7px;border-radius:99px}
+@keyframes pulse{50%{box-shadow:0 0 0 3px var(--orange),0 0 34px var(--orange)}}
+.hween{grid-column:span 2;background:radial-gradient(circle at 80% 20%,rgba(255,150,0,.55),transparent 55%),linear-gradient(160deg,#4a1500,#12060a);border:2px solid #ffb030;border-top-width:2px;box-shadow:0 0 30px rgba(255,140,0,.55)}
+.hween .t{font-family:'Creepster',fantasy;font-weight:400;font-size:2.1rem;color:#ffd47a;text-shadow:0 0 16px #ff7a00}
+.hween::before{content:'\1F383';position:absolute;right:14px;bottom:8px;font-size:3.4rem;filter:drop-shadow(0 0 14px #ff7a00);animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(6deg)}}
+footer{text-align:center;color:var(--muted);margin-top:30px;font-size:.9rem}
+#win{display:none;margin:22px auto 0;font-family:'Creepster',fantasy;font-size:2rem;color:#ffd47a;text-shadow:0 0 18px var(--orange)}
+@media(max-width:820px){.wds,.blank{display:none}#grid{grid-template-columns:1fr 1fr}.hween{grid-column:span 2}.wd{display:block}.day{min-height:132px}}
+@media(max-width:430px){#grid{grid-template-columns:1fr}.hween{grid-column:auto}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.panel{margin:0 auto 24px;max-width:920px;padding:16px;border-radius:16px;border:1px solid #4a2a7a;background:linear-gradient(180deg,rgba(40,16,70,.75),rgba(18,8,32,.88));box-shadow:0 0 30px rgba(162,75,255,.25)}
+.panel h2{font-family:'Creepster',fantasy;font-weight:400;font-size:1.8rem;margin:0 0 10px;letter-spacing:.05em;color:var(--purple);text-shadow:0 0 12px rgba(162,75,255,.7)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.panel label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.88rem}
+.panel select,.panel input{font:inherit;color:var(--text);background:#0c0616;border:1px solid #4a2a7a;border-radius:10px;padding:9px 11px;min-width:0}
+.panel input{flex:1 1 220px}
+.panel select:focus,.panel input:focus,.btn:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.btn{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;color:#1a0a00;background:linear-gradient(180deg,#ffa23a,var(--orange));box-shadow:0 0 16px rgba(255,106,0,.5)}
+.btn.alt{color:var(--text);background:#2a1650;box-shadow:none;border:1px solid #5a34a0}
+.btn:disabled{opacity:.5;cursor:wait}
+.msg{margin:2px 0 0;min-height:1.3em;color:#ffd47a;font-size:.92rem}
+.ed{position:absolute;top:9px;right:9px;z-index:2;width:28px;height:28px;border-radius:50%;border:1px solid #5a34a0;background:rgba(10,5,20,.7);color:var(--text);cursor:pointer;font-size:.9rem;line-height:1;padding:0}
+.ed:hover,.ed:focus-visible{background:var(--purple);outline:none}
+.today::after{right:44px}
+.box{display:none}
+@media(min-width:821px){.hween{grid-column:auto}.hween .t{font-size:1.8rem}}
+@media print{
+@page{size:A4 landscape;margin:8mm}
+html,body{background:#fff!important}
+body{color:#111;min-height:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.fog,.bat,.drips,.panel,.meter,.sub,.ed,#win,footer,.stamp,.today::after,.hween::before{display:none!important}
+main{padding:0;max-width:none}
+header{padding:0 0 4px}
+h1{font-size:2.6rem;color:#c24a00;text-shadow:none;animation:none;display:flex;gap:.4em;justify-content:center;align-items:baseline}
+h1 span{display:inline;font-size:1em;color:#6b2fb0;text-shadow:none}
+.legend{margin-top:2px;color:#444}.legend b{color:#111}.legend em{box-shadow:none}
+.wds{color:#6b2fb0;text-shadow:none;margin:2px 0 3px;font-size:1.05rem;gap:5px}
+#grid{gap:5px}
+.day{min-height:0;height:28mm;padding:5px 7px;background:#fff!important;border:1.5px solid #222;border-top:5px solid var(--c);border-radius:8px;box-shadow:none!important;opacity:1;filter:none;animation:none;break-inside:avoid;gap:1px}
+.n{font-size:1.5rem;color:#111;text-shadow:none}.t{font-size:.8rem;color:#111}.y{color:#444;font-size:.62rem}.sk{font-size:.7rem}
+.hween{background:#fff1dc!important;border:2px solid #e07000;border-top:5px solid #e07000}
+.hween .t{font-size:1.15rem;color:#a33c00;text-shadow:none}
+.box{display:block;position:absolute;right:6px;bottom:6px;width:15px;height:15px;border:2px solid #222;border-radius:3px;background:#fff}
+.done .box{background:#222}
+}
+
+.panel{position:relative;z-index:5}
+.sb{position:relative;flex:1 1 260px;min-width:0}
+.sb input{width:100%}
+#sug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;margin:0;padding:4px;list-style:none;max-height:320px;overflow:auto;background:#0c0616;border:1px solid #5a34a0;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.75)}
+#sug li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
+#sug li.on,#sug li:hover{background:#2a1650}
+#sug .m{font-weight:600}#sug .i{font-size:.78rem;color:var(--muted)}#sug .k{white-space:nowrap;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="fog"></div>
+<span class="bat">&#x1F987;</span><span class="bat">&#x1F987;</span><span class="bat">&#x1F987;</span>
+<div class="drips"></div>
+<main>
+<nav aria-label="Family navigation" style="padding:12px 0"><a href="/" style="color:var(--muted);font-size:.9rem;text-decoration:none">&larr; Back to the family homepage</a></nav>
+<header>
+<h1>31 Nights<span>of Fright</span></h1>
+<p class="sub">October 2026. One horror movie a night, two people, zero escape. Tap a night when you've survived it.</p>
+<div class="meter"><div class="bar"><i id="fill"></i></div><div class="count" id="count">0 / 31 survived</div></div>
+<div class="legend">
+<span><em style="--c:#6dff7a"></em><b>1</b> cozy scary</span>
+<span><em style="--c:#ffd23a"></em><b>2</b> spooky</span>
+<span><em style="--c:#ff6a00"></em><b>3</b> proper scary</span>
+<span><em style="--c:#ff2a4d"></em><b>4</b> lights on</span>
+<span><em style="--c:#e033ff"></em><b>5</b> nightmare fuel</span>
+</div>
+<div id="win">YOU SURVIVED OCTOBER &#x1F383;</div>
+</header>
+<section class="panel" id="panel">
+<h2>Pick a night's movie</h2>
+<div class="row">
+<label>Night <select id="pd"></select></label>
+<div class="sb"><input id="pm" type="text" placeholder="Search movies..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sug" aria-label="Movie title"><ul id="sug" role="listbox" hidden></ul></div>
+<button class="btn" id="add">Add &amp; rate it</button>
+</div>
+<div class="row">
+<label>Scare level <select id="ps"><option value="0">Auto</option><option value="1">1 cozy</option><option value="2">2 spooky</option><option value="3">3 proper scary</option><option value="4">4 lights on</option><option value="5">5 nightmare fuel</option></select></label>
+<button class="btn alt" id="rnd">&#x1F3B2; Random movie for this night</button>
+<button class="btn alt" id="prt">&#x1F5A8; Print for the fridge</button>
+</div>
+<p class="msg" id="msg" role="status"></p>
+</section>
+<div class="wds"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+<div id="grid"></div>
+<footer>Tap the pencil on any night to swap its movie. Picks and ticks are saved on this device.</footer>
+</main>
+<script>
+const M=[
+["Scream",1996,2,"Slasher"],["The Conjuring",2013,3,"Haunted house"],["Get Out",2017,3,"Social thriller"],
+["Shaun of the Dead",2004,1,"Zom-com"],["A Quiet Place",2018,2,"Creature feature"],["Insidious",2010,3,"Demonic"],
+["Ready or Not",2019,2,"Dark comedy"],["The Ring",2002,3,"Cursed tape"],["It Follows",2014,3,"Curse"],
+["Weapons",2025,4,"Mystery horror"],["Zombieland",2009,1,"Zom-com"],["Sinister",2012,4,"Found footage"],
+["The Descent",2005,4,"Creature feature"],["Barbarian",2022,3,"Basement dread"],["The Others",2001,2,"Ghost story"],
+["The Exorcist",1973,4,"Possession"],["Hereditary",2018,5,"Family nightmare"],["What We Do in the Shadows",2014,1,"Vampire comedy"],
+["28 Days Later",2002,3,"Infection"],["Midsommar",2019,4,"Daylight horror"],["Trick 'r Treat",2007,2,"Anthology"],
+["The Thing",1982,4,"Body horror"],["Alien",1979,3,"Sci-fi horror"],["A Nightmare on Elm Street",1984,3,"Slasher"],
+["Coraline",2009,1,"Creepy cozy"],["The Babadook",2014,3,"Psychological"],["Talk to Me",2022,4,"Possession"],
+["Evil Dead II",1987,3,"Splatstick"],["Psycho",1960,3,"Classic"],["The Shining",1980,4,"Cabin fever"],
+["Halloween",1978,3,"Halloween night"]];
+const C=["","#6dff7a","#ffd23a","#ff6a00","#ff2a4d","#e033ff"];
+const WK=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ld=k=>{try{return JSON.parse(localStorage.getItem(k)||"{}")}catch(e){return{}}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let seen=ld("fright31"),picks=ld("fright31picks");
+const now=new Date();
+const today=(now.getFullYear()===2026&&now.getMonth()===9)?now.getDate():0;
+const first=new Date(2026,9,1).getDay();
+const mv=d=>picks[d]||M[d-1];
+const g=$("grid"),pd=$("pd"),pm=$("pm"),ps=$("ps"),add=$("add"),rnd=$("rnd"),sav=$("sav");
+const msg=t=>{$("msg").textContent=t};
+for(let d=1;d<=31;d++)pd.insertAdjacentHTML("beforeend",'<option value="'+d+'">Oct '+d+' &middot; '+WK[new Date(2026,9,d).getDay()]+'</option>');
+pd.value=today||1;
+function render(){
+let h="";
+for(let i=0;i<first;i++)h+='<div class="blank"></div>';
+for(let d=1;d<=31;d++){
+const m=mv(d),wd=WK[new Date(2026,9,d).getDay()];
+const cls="day"+(d===31?" hween":"")+(d===today?" today":"")+(seen[d]?" done":"");
+h+='<div class="'+cls+'" role="button" tabindex="0" aria-pressed="'+!!seen[d]+'" data-d="'+d+'" style="--c:'+C[m[2]]+'"'+(m[4]?' title="'+esc(m[4])+'"':'')+'>'+
+'<button class="ed" data-e="'+d+'" aria-label="Change the movie for October '+d+'" title="Change this night\'s movie">&#x270E;</button>'+
+'<span class="n">'+d+'</span><span class="wd">'+wd+'</span>'+
+'<b class="t">'+esc(m[0])+'</b><span class="y">'+(m[1]?m[1]+' &middot; ':'')+esc(m[3])+'</span>'+
+'<span class="sk">'+"\u{1F480}".repeat(m[2])+'<s>'+"\u{1F480}".repeat(5-m[2])+'</s></span>'+
+'<i class="stamp">SURVIVED</i><span class="box"></span></div>';
+}
+g.innerHTML=h;upd();
+}
+function upd(){
+const n=Object.keys(seen).filter(k=>seen[k]).length;
+$("fill").style.width=(n/31*100)+"%";
+$("count").textContent=n+" / 31 survived";
+$("win").style.display=n===31?"block":"none";
+}
+function toggle(b){
+const d=b.dataset.d;seen[d]=!seen[d];
+b.classList.toggle("done",!!seen[d]);b.setAttribute("aria-pressed",!!seen[d]);
+sv("fright31",seen);upd();
+}
+g.addEventListener("click",e=>{
+const ed=e.target.closest(".ed");
+if(ed){pd.value=ed.dataset.e;$("panel").scrollIntoView({behavior:"smooth",block:"center"});pm.focus();return}
+const b=e.target.closest(".day");if(b)toggle(b);
+});
+g.addEventListener("keydown",e=>{
+if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("day")){e.preventDefault();toggle(e.target)}
+});
+const EXTRA=`Halloween II|1981|3|Slasher
+Friday the 13th|1980|3|Slasher
+Black Christmas|1974|3|Slasher
+Scream 2|1997|2|Slasher
+I Know What You Did Last Summer|1997|2|Slasher
+Urban Legend|1998|2|Slasher
+The Texas Chain Saw Massacre|1974|5|Slasher
+Child's Play|1988|3|Killer doll
+Final Destination|2000|3|Death thriller
+Happy Death Day|2017|1|Slasher comedy
+Freaky|2020|2|Slasher comedy
+Terrifier|2016|5|Extreme slasher
+Terrifier 2|2022|5|Extreme slasher
+X|2022|4|Slasher
+Pearl|2022|4|Psychological
+Scream VI|2023|3|Slasher
+Fear Street: 1994|2021|2|Teen slasher
+Halloween|2018|3|Slasher
+The Conjuring 2|2016|3|Haunted house
+The Conjuring: Last Rites|2025|3|Haunted house
+Annabelle|2014|3|Haunted doll
+Insidious: Chapter 2|2013|3|Supernatural
+Poltergeist|1982|3|Haunted house
+The Amityville Horror|1979|3|Haunted house
+The Haunting|1963|3|Haunted house
+The Orphanage|2007|3|Ghost story
+The Innocents|1961|2|Gothic
+Crimson Peak|2015|2|Gothic romance
+The Woman in Black|2012|3|Ghost story
+Paranormal Activity|2007|3|Found footage
+Lights Out|2016|3|Supernatural
+Oculus|2013|3|Haunted mirror
+Mama|2013|3|Ghost story
+The Autopsy of Jane Doe|2016|3|Supernatural
+Hush|2016|3|Home invasion
+Don't Breathe|2016|3|Home invasion
+The Strangers|2008|4|Home invasion
+You're Next|2011|3|Home invasion
+Smile|2022|3|Psychological
+Smile 2|2024|3|Psychological
+Longlegs|2024|4|Occult thriller
+Nope|2022|3|Sci-fi horror
+Us|2019|3|Doppelganger
+His House|2020|3|Ghost story
+Host|2020|3|Zoom horror
+The Blair Witch Project|1999|3|Found footage
+Rosemary's Baby|1968|3|Occult
+The Omen|1976|3|Occult
+The Witch|2015|4|Folk horror
+The Lighthouse|2019|4|Psychological
+Suspiria|1977|4|Giallo
+Carrie|1976|3|Supernatural
+Misery|1990|3|Thriller
+Cujo|1983|3|Creature
+It|2017|3|Supernatural
+It Chapter Two|2019|3|Supernatural
+Pet Sematary|1989|3|Supernatural
+The Black Phone|2021|3|Supernatural
+The Invisible Man|2020|3|Thriller
+Fresh|2022|3|Dark thriller
+Bodies Bodies Bodies|2022|2|Dark comedy
+Sinners|2025|3|Vampire
+A Quiet Place Part II|2020|2|Creature feature
+Bird Box|2018|2|Thriller
+Cloverfield|2008|2|Monster
+10 Cloverfield Lane|2016|2|Thriller
+The Mist|2007|3|Creature
+Jaws|1975|2|Creature feature
+Gremlins|1984|1|Horror comedy
+Ghostbusters|1984|1|Comedy
+The Lost Boys|1987|2|Vampire
+Fright Night|1985|2|Vampire
+Interview with the Vampire|1994|2|Vampire
+Bram Stoker's Dracula|1992|3|Gothic
+Dracula|1931|1|Classic
+Frankenstein|1931|1|Classic
+Nosferatu|1922|2|Silent classic
+Nosferatu|2024|3|Gothic
+The Wolf Man|1941|1|Classic
+An American Werewolf in London|1981|3|Werewolf
+The Howling|1981|3|Werewolf
+Ginger Snaps|2000|3|Werewolf
+Let the Right One In|2008|3|Vampire
+Near Dark|1987|3|Vampire
+From Dusk Till Dawn|1996|3|Vampire
+Candyman|1992|3|Supernatural slasher
+The Fly|1986|4|Body horror
+Videodrome|1983|4|Body horror
+Annihilation|2018|3|Sci-fi horror
+Event Horizon|1997|4|Sci-fi horror
+Aliens|1986|3|Sci-fi horror
+Splice|2009|3|Sci-fi horror
+Alien: Romulus|2024|3|Sci-fi horror
+The Exorcism of Emily Rose|2005|3|Possession
+Evil Dead|2013|4|Possession
+The Evil Dead|1981|4|Splatter
+Evil Dead Rise|2023|4|Possession
+Bring Her Back|2025|4|Possession
+[REC]|2007|4|Found footage
+Quarantine|2008|3|Found footage
+Train to Busan|2016|3|Zombie
+Night of the Living Dead|1968|3|Zombie
+Dawn of the Dead|1978|3|Zombie
+Dawn of the Dead|2004|3|Zombie
+World War Z|2013|2|Zombie
+28 Weeks Later|2007|4|Infection
+28 Years Later|2025|4|Infection
+Re-Animator|1985|3|Horror comedy
+Return of the Living Dead|1985|2|Zom-com
+The Cabin in the Woods|2012|2|Horror comedy
+Tucker and Dale vs Evil|2010|1|Horror comedy
+Scary Movie|2000|1|Parody
+Little Shop of Horrors|1986|1|Musical
+The Rocky Horror Picture Show|1975|1|Cult musical
+Beetlejuice|1988|1|Gothic comedy
+Beetlejuice Beetlejuice|2024|1|Gothic comedy
+Hocus Pocus|1993|1|Family Halloween
+The Nightmare Before Christmas|1993|1|Animated
+Casper|1995|1|Family
+Monster House|2006|1|Animated
+ParaNorman|2012|1|Animated
+Goosebumps|2015|1|Family
+The Addams Family|1991|1|Comedy
+Practical Magic|1998|1|Witch comedy
+One Cut of the Dead|2017|1|Zom-com
+Saw|2004|4|Torture horror
+Hostel|2005|5|Torture horror
+The Human Centipede|2009|5|Extreme
+Martyrs|2008|5|Extreme
+Audition|1999|4|Psychological
+Ringu|1998|3|Cursed tape
+Ju-On: The Grudge|2002|3|Ghost story
+The Grudge|2004|3|Ghost story
+Dark Water|2002|3|Ghost story
+The Platform|2019|4|Dystopian
+Raw|2016|4|Cannibal
+Titane|2021|4|Body horror
+Saint Maud|2019|3|Psychological
+Relic|2020|3|Psychological
+The Night House|2020|3|Supernatural
+Dog Soldiers|2002|3|Werewolf
+The Ritual|2017|3|Folk horror
+The Wicker Man|1973|3|Folk horror
+Don't Look Now|1973|3|Psychological
+Hellraiser|1987|4|Body horror
+M3GAN|2022|2|Killer doll
+Orphan|2009|3|Thriller
+The Visit|2015|2|Found footage
+Split|2016|3|Thriller
+Signs|2002|2|Alien
+The Sixth Sense|1999|2|Ghost story
+The Birds|1963|2|Creature
+The Silence of the Lambs|1991|4|Psychological
+Vivarium|2019|3|Sci-fi
+The Substance|2024|5|Body horror
+Heretic|2024|3|Thriller
+Together|2025|4|Body horror
+Final Destination Bloodlines|2025|3|Death thriller`;
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const dup=new Set();
+const DB=[...M.map(a=>a.slice(0,4)),...EXTRA.split("\n").map(l=>{const a=l.split("|");return[a[0],+a[1],+a[2],a[3]]})]
+.filter(m=>{const k=norm(m[0])+m[1];if(dup.has(k))return false;dup.add(k);return true})
+.map(m=>({t:m[0],y:m[1],k:m[2],g:m[3],n:norm(m[0]),est:false}));
+const TAGS=[["slasher","Slasher",3],["zombie","Zombie",3],["vampire","Vampire",2],["supernatural","Supernatural",3],["psychological","Psychological",3],["found footage","Found footage",3],["comedy","Comedy",1],["animated","Animated",1],["family","Family",1],["horror","Horror",3],["thriller","Thriller",2],["science fiction","Sci-fi",2],["fantasy","Fantasy",1]];
+const ul=$("sug");
+let items=[],hi=-1,tm,ctl;
+function local(q){
+const n=norm(q);if(!n)return[];
+return DB.map(m=>({m,s:m.n.startsWith(n)?0:m.n.includes(" "+n)?1:m.n.includes(n)?2:9})).filter(x=>x.s<9).sort((a,b)=>a.s-b.s||a.m.y-b.m.y).slice(0,6).map(x=>x.m);
+}
+function fromWiki(p){
+const d=(p.description||"").toLowerCase(),t=p.title;
+const ym=d.match(/\b(18|19|20)\d\d\b/)||t.match(/\b(18|19|20)\d\d\b/);
+const h=TAGS.find(x=>d.includes(x[0]))||["","Film",2];
+return{t:t.replace(/\s*\((\d{4} )?(\w+ )?film\)/i,""),y:ym?+ym[0]:"",k:/gore|splatter|torture|extreme|cannibal/.test(d)?4:h[2],g:h[1],n:norm(t.replace(/\s*\(.*film\)/i,"")),est:true};
+}
+async function wiki(q,signal){
+const u="https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(q+" film")+"&gsrlimit=8&prop=description&format=json&origin=*";
+const j=await (await fetch(u,{signal})).json();
+return Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>a.index-b.index)
+.filter(p=>/film/i.test(p.description||"")&&!/television|series/i.test(p.description||"")).map(fromWiki);
+}
+function show(){
+ul.innerHTML=items.map((m,i)=>'<li role="option" data-i="'+i+'"'+(i===hi?' class="on"':'')+'><span><span class="m">'+esc(m.t)+'</span> <span class="i">'+(m.y?m.y+' &middot; ':'')+esc(m.g)+(m.est?' &middot; from the web':'')+'</span></span><span class="k">'+(m.est?'~':'')+"\u{1F480}".repeat(m.k)+'</span></li>').join("");
+ul.hidden=!items.length;pm.setAttribute("aria-expanded",!ul.hidden);
+const on=ul.querySelector(".on");if(on)on.scrollIntoView({block:"nearest"});
+}
+function place(m){
+const d=+pd.value,lv=+ps.value,k=lv||m.k,guess=m.est&&!lv;
+picks[d]=[m.t,m.y,k,m.g,guess?"Scare level is an estimate. Use the scare level menu to change it.":""];
+sv("fright31picks",picks);render();pm.value="";items=[];show();
+msg("Oct "+d+": "+m.t+(m.y?" ("+m.y+")":"")+", scare level "+k+"/5"+(guess?" (estimated)":"")+". Tap the pencil on the card to change it.");
+}
+function addTyped(){
+const t=pm.value.trim();
+if(!t){msg("Type a movie title first.");return}
+const hit=local(t).find(m=>m.n===norm(t));
+place(hit||{t:t.slice(0,60),y:"",k:3,g:"Horror",est:true});
+}
+pm.addEventListener("input",()=>{
+const q=pm.value.trim();
+clearTimeout(tm);if(ctl)ctl.abort();
+items=local(q);hi=-1;show();
+if(q.length<3)return;
+tm=setTimeout(async()=>{
+ctl=new AbortController();
+try{
+const w=await wiki(q,ctl.signal);
+if(pm.value.trim()!==q)return;
+items=items.concat(w.filter(m=>!DB.some(d=>d.n===m.n&&d.y===m.y))).slice(0,9);show();
+}catch(e){}
+},350);
+});
+pm.addEventListener("keydown",e=>{
+if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+if(!items.length)return;e.preventDefault();
+hi=(hi+(e.key==="ArrowDown"?1:-1)+items.length)%items.length;show();
+}else if(e.key==="Enter"){e.preventDefault();hi>=0?place(items[hi]):addTyped()}
+else if(e.key==="Escape"){items=[];show()}
+});
+pm.addEventListener("blur",()=>{ul.hidden=true});
+ul.addEventListener("mousedown",e=>{const li=e.target.closest("li");if(li){e.preventDefault();place(items[+li.dataset.i])}});
+add.onclick=addTyped;
+rnd.onclick=()=>{
+const used=new Set(Array.from({length:31},(_,i)=>mv(i+1)).map(m=>norm(m[0])+m[1]));
+const lv=+ps.value,pool=DB.filter(m=>!used.has(m.n+m.y)&&(!lv||m.k===lv));
+if(!pool.length){msg("No unused movies left at that scare level. Try another level.");return}
+place(pool[Math.floor(Math.random()*pool.length)]);
+};
+$("prt").onclick=()=>{try{window.print()}catch(e){msg("Press Ctrl+P and choose landscape.")}};
+render();
+msg("Start typing a movie title to see suggestions.");
+</script>
+</body>
+</html>

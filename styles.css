@@ -1,0 +1,90 @@
+:root {
+  --bg: #1e1b24;
+  --card: #2a2633;
+  --card-hover: #342f40;
+  --text: #f3eef8;
+  --muted: #b9b0c7;
+  --pink: #f4b6d2;
+  --lavender: #c9b6f2;
+  --mint: #a8e6cf;
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 4rem 1.25rem;
+}
+
+header { text-align: center; margin-bottom: 2.5rem; }
+
+.moon {
+  margin: 0;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--lavender);
+}
+
+h1 {
+  margin: .75rem 0 .25rem;
+  font-size: 2rem;
+  color: var(--pink);
+}
+
+.intro { margin: 0; color: var(--muted); }
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.links a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--card);
+  border: 2px solid var(--lavender);
+  border-radius: 1rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.links a:hover { background: var(--card-hover); }
+
+.links a:focus-visible {
+  outline: 3px solid var(--mint);
+  outline-offset: 3px;
+}
+
+.icon { font-size: 1.75rem; }
+
+.text { flex: 1; display: grid; }
+
+.title { font-size: 1.25rem; font-weight: 700; color: var(--pink); }
+
+.note { color: var(--muted); font-size: 1rem; }
+
+.arrow { font-size: 1.5rem; color: var(--mint); }
+
+.more {
+  margin-top: 2rem;
+  text-align: center;
+  color: var(--muted);
+}
