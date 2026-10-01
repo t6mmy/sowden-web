@@ -11,9 +11,120 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <style>
+    .password-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1e1b24 0%, #2a1f2e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .password-screen.hidden {
+      display: none;
+    }
+
+    .password-form {
+      background: #2a1f2e;
+      border: 2px solid #4a3a52;
+      border-radius: 16px;
+      padding: 48px 32px;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .password-form h1 {
+      color: #f4eaff;
+      font-size: 1.8rem;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+
+    .password-form p {
+      color: #a898c8;
+      margin: 0 0 24px 0;
+      font-size: 0.95rem;
+    }
+
+    .password-form input {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border: 2px solid #4a3a52;
+      border-radius: 12px;
+      background: #1e1b24;
+      color: #f4eaff;
+      font-size: 1rem;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+
+    .password-form input:focus {
+      outline: none;
+      border-color: #a24bff;
+    }
+
+    .password-form input::placeholder {
+      color: #5d4a6f;
+    }
+
+    .password-form button {
+      width: 100%;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #a24bff 0%, #7c3aff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .password-form button:hover {
+      opacity: 0.9;
+    }
+
+    .password-form button:active {
+      opacity: 0.8;
+    }
+
+    .password-form.error input {
+      border-color: #d10f2c;
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .error-msg {
+      color: #d10f2c;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      min-height: 20px;
+    }
+  </style>
 </head>
 <body>
-  <main>
+  <div class="password-screen" id="passwordScreen">
+    <div class="password-form" id="passwordForm">
+      <h1>🌙 Welcome</h1>
+      <p>Enter password to continue</p>
+      <div class="error-msg" id="errorMsg"></div>
+      <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
+      <button type="button" id="passwordBtn">Unlock</button>
+    </div>
+  </div>
+
+  <main id="mainContent" style="display: none;">
     <header>
       <p class="moon" aria-hidden="true">☾</p>
       <h1>Our Family Links</h1>
@@ -46,5 +157,62 @@
 
     <p class="more">More links coming soon.</p>
   </main>
+
+  <script>
+    // Set your password here
+    const CORRECT_PASSWORD = 'sowden';
+
+    const passwordScreen = document.getElementById('passwordScreen');
+    const mainContent = document.getElementById('mainContent');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordBtn = document.getElementById('passwordBtn');
+    const passwordForm = document.getElementById('passwordForm');
+    const errorMsg = document.getElementById('errorMsg');
+
+    // Check if already logged in
+    function checkAccess() {
+      if (sessionStorage.getItem('accessGranted') === 'true') {
+        grantAccess();
+      }
+    }
+
+    function grantAccess() {
+      sessionStorage.setItem('accessGranted', 'true');
+      passwordScreen.classList.add('hidden');
+      mainContent.style.display = 'block';
+      passwordInput.value = '';
+    }
+
+    function checkPassword() {
+      const input = passwordInput.value.trim();
+      errorMsg.textContent = '';
+      passwordForm.classList.remove('error');
+
+      if (input === CORRECT_PASSWORD) {
+        grantAccess();
+      } else {
+        errorMsg.textContent = 'Incorrect password';
+        passwordForm.classList.add('error');
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    }
+
+    passwordBtn.addEventListener('click', checkPassword);
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
+    });
+
+    passwordInput.addEventListener('focus', () => {
+      passwordForm.classList.remove('error');
+      errorMsg.textContent = '';
+    });
+
+    // Check access on load
+    checkAccess();
+    passwordInput.focus();
+  </script>
 </body>
 </html>
