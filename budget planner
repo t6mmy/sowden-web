@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Family — Weekly Budget</title>
+<style>
+  :root{
+    --bg:#eef4fb; --card:#ffffff; --ink:#1f2d3d; --muted:#5d7186;
+    --teal:#12a594; --coral:#ef6f6c; --sun:#f2a541; --grape:#7c6cff;
+    --line:#dde7f2; --ok:#0f8a63; --bad:#c0392b; --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:ui-rounded,"SF Pro Rounded","Segoe UI Variable","Segoe UI",system-ui,-apple-system,sans-serif;
+    background:var(--bg); color:var(--ink); font-size:16px; line-height:1.45;
+    padding-bottom:120px;
+  }
+  h1,h2,h3{margin:0 0 8px; line-height:1.25}
+  h2{font-size:1.15rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .hint{font-weight:400; font-size:.8rem; color:var(--muted)}
+  button{font:inherit; cursor:pointer; border-radius:999px; border:1px solid var(--line);
+    background:#fff; color:var(--ink); padding:9px 14px; min-height:42px; font-weight:600;
+    transition:transform .08s ease, background .15s ease, box-shadow .15s ease;}
+  button:hover{background:#f7fbff}
+  button:active{transform:scale(.97)}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{
+    outline:3px solid #8fd6ff; outline-offset:2px}
+  button.primary{background:linear-gradient(135deg,#12a594,#0e8f80); color:#fff; border-color:transparent;
+    box-shadow:0 3px 10px rgba(18,165,148,.32)}
+  button.primary:hover{background:linear-gradient(135deg,#14b3a0,#0e8f80)}
+  button.ghost{background:#f2f7fd; border-color:#e2ecf7; font-weight:600}
+  button.small{padding:7px 11px; min-height:36px; font-size:.85rem}
+  button.danger{color:#a4342c; background:#fdf2f1; border-color:#f7dcd9}
+  input,textarea{font:inherit; color:var(--ink); background:#fff; border:1.5px solid var(--line);
+    border-radius:12px; padding:8px 10px; min-width:0}
+  input[type=number]{text-align:right; width:5.6rem; -moz-appearance:textfield}
+  input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .print-only{display:none}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center;
+    padding:12px 16px; background:#fff; border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:30; box-shadow:0 2px 10px rgba(31,45,61,.05)}
+  .brand{display:flex; align-items:center; gap:8px; font-weight:800; font-size:1.05rem}
+  .brand input{width:11rem; font-weight:800; border-color:transparent; background:#f4f8fd; padding:6px 10px}
+  .brand input:hover{border-color:var(--line)}
+  .brand-sub{color:var(--muted); font-weight:600; font-size:.85rem}
+  .logo{font-size:1.3rem}
+  .weeknav{display:flex; align-items:center; gap:8px; background:#f4f8fd; border-radius:999px; padding:5px 8px}
+  .weeknav .icon-btn{width:40px; padding:0; border-color:transparent; background:#fff}
+  .weeklabel{font-weight:700; font-size:.95rem; min-width:12.5rem; text-align:center}
+  .actions{display:flex; gap:8px; flex-wrap:wrap; margin-left:auto}
+  main{max-width:1180px; margin:16px auto 0; padding:0 16px; display:grid; gap:14px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 16px 16px; box-shadow:0 3px 14px rgba(31,45,61,.055)}
+  details.card > summary{cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px;
+    font-weight:700; font-size:1.15rem; margin:-4px -4px 10px; padding:4px}
+  details.card > summary::-webkit-details-marker{display:none}
+  details > summary .caret{transition:transform .18s ease; color:var(--muted); font-size:.9rem}
+  details[open] > summary .caret{transform:rotate(180deg)}
+  .caret{margin-left:auto}
+  .step{border-left:6px solid var(--teal)}
+  .step.s2{border-left-color:var(--sun)}
+  .step.s3{border-left-color:var(--grape)}
+  .howto{border-left:6px solid var(--grape)}
+  .howto ol{margin:6px 0 0 1.1rem; padding:0}
+  .howto li{margin-bottom:4px}
+
+  /* ---------- lists ---------- */
+  .items{display:grid; gap:8px; margin-top:8px}
+  .item{display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center;
+    padding:8px; border:1px solid var(--line); border-radius:14px; background:#fcfdff}
+  .item.paid{background:#f0fbf6; border-color:#c9ecdd}
+  .item.over{background:#fdf3f2; border-color:#f6d8d5}
+  .emo{width:42px; height:42px; min-height:42px; padding:0; font-size:1.25rem; line-height:1;
+    background:#fff; border-color:var(--line); border-radius:12px}
+  .item .label,.gname{border-color:transparent; background:transparent; font-weight:600; width:100%}
+  .item .label:hover,.gname:hover{border-color:var(--line); background:#fff}
+  .nums{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .mini{display:flex; align-items:center; gap:5px; font-size:.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.03em}
+  .mini input{padding:6px 8px; border-radius:10px}
+  .tick{width:42px; min-height:42px; padding:0; font-size:1.05rem; color:var(--muted); font-weight:800}
+  .item.paid .tick{background:#dff5ea; color:var(--ok); border-color:#bfe8d6}
+  .del{width:38px; min-height:38px; padding:0; color:#b3becd; border-color:transparent; background:transparent}
+  .del:hover{color:#c0392b; background:#fdf2f1}
+  .row-end{display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; color:var(--muted); font-weight:600}
+  .spacer{flex:1}
+  .ghead{gap:8px}
+  .ghead .gname{font-size:1rem}
+  .gsum{display:flex; gap:8px; align-items:baseline; white-space:nowrap; font-size:.9rem}
+  .gsum b{font-size:1rem}
+  .g-spent{color:var(--muted); font-size:.78rem}
+  details.group[open]{padding-bottom:14px}
+  .grp-tools{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+  .total-line{display:flex; justify-content:space-between; align-items:center; margin-top:12px;
+    padding-top:10px; border-top:2px dashed var(--line); font-weight:700}
+  .total-line b{font-size:1.15rem}
+
+  /* ---------- sticky summary ---------- */
+  .summarybar{position:fixed; left:0; right:0; bottom:0; z-index:40; background:#fff;
+    border-top:1px solid var(--line); box-shadow:0 -3px 16px rgba(31,45,61,.09);
+    padding:10px 16px 12px; display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center}
+  .sbar-item{display:flex; flex-direction:column; line-height:1.1}
+  .sbar-item span{font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:800}
+  .sbar-item b{font-size:1.05rem}
+  .sbar-item.hero b{font-size:1.5rem}
+  .good{color:var(--ok)} .bad{color:var(--bad)}
+  .barwrap{flex:1 1 240px; min-width:180px}
+  .bar{height:12px; background:#eaf1f9; border-radius:999px; overflow:hidden}
+  .bar-fill{height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,#7be0c8,#12a594); transition:width .25s ease}
+  .alloc{font-size:.74rem; color:var(--muted); font-weight:700; margin-top:3px; display:block}
+
+  /* ---------- goals / jobs ---------- */
+  .mini-row{display:grid; grid-template-columns:auto 1fr auto auto; gap:8px; align-items:center;
+    padding:8px; border:1px solid var(--line); border-radius:14px; background:#fcfdff; margin-top:8px}
+  .goal-bar{height:9px; background:#eaf1f9; border-radius:999px; overflow:hidden; margin-top:7px}
+  .goal-bar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,#b9a3ff,#7c6cff); border-radius:999px; transition:width .25s}
+  .goal-note{font-size:.76rem; color:var(--muted); font-weight:700}
+
+  /* ---------- nappy ---------- */
+  .nappy{display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap}
+  .nappy label{display:flex; flex-direction:column; gap:4px; font-size:.8rem; font-weight:700; color:var(--muted)}
+  .nappy-out{font-weight:700; padding-bottom:8px}
+  .nappy-out b{font-size:1.2rem; color:var(--teal)}
+
+  /* ---------- notes / settings ---------- */
+  textarea{width:100%; min-height:74px; resize:vertical; border-radius:14px}
+  .notesgrid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media(max-width:760px){.notesgrid{grid-template-columns:1fr}}
+  .setgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; align-items:end}
+  .setgrid label{display:flex; flex-direction:column; gap:5px; font-size:.82rem; font-weight:700; color:var(--muted)}
+  .switch{display:flex; align-items:center; gap:9px; font-weight:700; font-size:.9rem; background:#f7fbff;
+    border:1px solid var(--line); border-radius:999px; padding:9px 14px; min-height:42px}
+  .switch input{width:20px; height:20px}
+  .savestate{font-size:.78rem; color:var(--muted); font-weight:700; margin-top:10px}
+
+  /* ---------- modals ---------- */
+  .overlay{position:fixed; inset:0; background:rgba(24,38,56,.45); display:flex; align-items:center;
+    justify-content:center; z-index:60; padding:18px}
+  .overlay[hidden]{display:none}
+  .sheet{background:#fff; border-radius:22px; padding:18px; max-width:620px; width:100%;
+    max-height:88vh; overflow:auto; box-shadow:0 18px 50px rgba(20,35,55,.3)}
+  .emoji-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(50px,1fr)); gap:6px; margin:12px 0}
+  .emoji-grid button{font-size:1.35rem; padding:6px; min-height:50px; border-radius:12px}
+  .sheet textarea{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.78rem; min-height:140px}
+  .row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  #toast{position:fixed; top:14px; left:50%; transform:translate(-50%,-140%); z-index:80;
+    background:#1f2d3d; color:#fff; padding:11px 18px; border-radius:999px; font-weight:700;
+    transition:transform .25s ease; box-shadow:0 8px 24px rgba(20,35,55,.3); max-width:92vw; text-align:center}
+  #toast.show{transform:translate(-50%,0)}
+
+  /* ---------- confetti ---------- */
+  .confetti{position:fixed; top:-14px; width:9px; height:15px; z-index:70; pointer-events:none;
+    animation:fall 2.3s linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(560deg); opacity:.15}}
+  @media (prefers-reduced-motion: reduce){.confetti{display:none}}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:820px){
+    body{font-size:15px}
+    .actions{width:100%}
+    .weeklabel{min-width:0; flex:1}
+    .item{grid-template-columns:auto 1fr; grid-template-areas:"emo label" "nums nums"}
+    .item .emo{grid-area:emo}
+    .item .label{grid-area:label}
+    .item .nums{grid-area:nums; justify-content:flex-start}
+    .mini input{width:5rem}
+    .summarybar{gap:8px 16px; padding:8px 12px 10px}
+    .sbar-item.hero b{font-size:1.25rem}
+  }
+
+  /* ---------- print ---------- */
+  @page{size:A4; margin:12mm}
+  @media print{
+    body{background:#fff; padding:0; font-size:10.5pt; color:#111}
+    .no-print{display:none !important}
+    .print-only{display:block}
+    main{max-width:none; margin:0; padding:0; display:block}
+    .card{border:1px solid #bbb; box-shadow:none; border-radius:8px; margin-bottom:6mm;
+      break-inside:avoid; page-break-inside:avoid; padding:4mm}
+    .step{border-left:3px solid #666}
+    .print-head{display:block; margin-bottom:5mm; border-bottom:2px solid #333; padding-bottom:3mm}
+    .print-head h1{font-size:15pt; margin:0}
+    .p-sub{font-size:10pt; font-weight:600; margin-top:2px}
+    .p-legend{font-size:8.5pt; color:#555; margin-top:3px}
+    #groups{column-count:2; column-gap:7mm}
+    #groups details{display:block; break-inside:avoid; page-break-inside:avoid}
+    .nums{gap:6mm}
+    .mini{font-size:8pt; color:#444}
+    input{border:none !important; background:transparent !important; padding:0 !important; font-weight:600}
+    input[type=number]{width:16mm; border-bottom:1px dotted #999 !important; border-radius:0}
+    .item{border:none; border-bottom:1px dotted #ddd; border-radius:0; padding:1.6mm 0; background:#fff !important}
+    .emo,.tick,.del,.row-end,.summarybar{display:none !important}
+    .item .emo{display:block !important; border:none; width:auto; height:auto; font-size:12pt; background:none}
+    .print-only{display:inline !important}
+    .prtick{font-size:13pt; margin-left:2mm}
+    .gsum b{font-size:11pt}
+    .print-foot{display:block; margin-top:4mm; border-top:2px solid #333; padding-top:3mm}
+    .pf-row{display:flex; gap:10mm; flex-wrap:wrap; font-size:11pt; font-weight:700}
+    .pf-lines{display:block; margin-top:4mm; font-size:10pt; color:#444}
+    .pf-lines i{display:block; border-bottom:1px solid #bbb; height:7mm}
+    details > summary{cursor:default}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar no-print">
+  <div class="brand">
+    <span class="logo">💰</span>
+    <input id="family" data-act="family" placeholder="Our family" aria-label="Family name" maxlength="30">
+    <span class="brand-sub">weekly budget</span>
+  </div>
+  <div class="weeknav">
+    <button class="icon-btn" data-do="prev" title="Previous week" aria-label="Previous week">◀</button>
+    <div class="weeklabel" id="weeklabel">Week</div>
+    <button class="icon-btn" data-do="next" title="Next week" aria-label="Next week">▶</button>
+    <button class="ghost small" data-do="today">This week</button>
+  </div>
+  <div class="actions">
+    <button class="ghost" data-do="copy-last">⧉ Copy last week's plan</button>
+    <button class="ghost" data-do="tpl">↺ Starter list</button>
+    <button class="ghost" data-do="backup">💾 Backup</button>
+    <button class="primary" data-do="print">🖨️ Print this week</button>
+  </div>
+</header>
+
+<div class="print-head print-only">
+  <h1 id="p-title">Our family — Weekly budget</h1>
+  <div class="p-sub" id="p-week"></div>
+  <div class="p-legend">Plan = what you set &nbsp;•&nbsp; Spent = what you've spent &nbsp;•&nbsp; ☐ tick it off when it's paid</div>
+</div>
+
+<main>
+  <details class="card howto no-print" open>
+    <summary><span>👋</span><span>How this works (30 seconds)</span><span class="caret">▾</span></summary>
+    <ol>
+      <li><b>1️⃣ Money in</b> — pop in whatever money is coming this week.</li>
+      <li><b>2️⃣ Money out</b> — set a plan next to each thing. Fill in "Spent" as the week goes.</li>
+      <li>Watch the bar at the bottom. Green = you're covered. Red = a little too much planned.</li>
+      <li>Next week, hit <b>⧉ Copy last week's plan</b> and just change what's different.</li>
+      <li>When you're done, hit <b>🖨️ Print this week</b> and stick it on the fridge.</li>
+    </ol>
+  </details>
+
+  <section class="card step">
+    <h2>1️⃣ Money in <span class="hint">whatever is coming this week</span></h2>
+    <div class="items" id="income"></div>
+    <div class="row-end">
+      <button class="ghost small" data-do="add-income">+ Add money in</button>
+      <span class="spacer"></span>
+      <span>Total money in: <b id="inc-total">$0.00</b></span>
+    </div>
+  </section>
+
+  <section class="card step s2">
+    <h2>2️⃣ Money out <span class="hint">set a plan, then tick things off</span></h2>
+    <div id="groups"></div>
+    <div class="grp-tools">
+      <button class="ghost small" data-do="add-group">+ New group</button>
+    </div>
+  </section>
+
+  <section class="card step s3 no-print">
+    <h2>3️⃣ Savings goals <span class="hint">even $5 counts</span></h2>
+    <div id="goals"></div>
+    <div class="row-end">
+      <button class="ghost small" data-do="add-goal">+ Add a goal</button>
+    </div>
+  </section>
+
+  <section class="card no-print">
+    <h2>🪙 Job chart <span class="hint">good for the 10-year-old — tick when done</span></h2>
+    <div id="jobs"></div>
+    <div class="row-end">
+      <button class="ghost small" data-do="add-job">+ Add a job</button>
+      <span class="spacer"></span>
+      <span>Earned this week: <b id="job-total">$0.00</b></span>
+    </div>
+  </section>
+
+  <section class="card no-print">
+    <h2>👶 Quick baby maths <span class="hint">handy + optional</span></h2>
+    <div class="nappy">
+      <label>Nappies a day
+        <input type="number" id="npd" value="6" min="0" step="1" data-act="nappy">
+      </label>
+      <label>Price each
+        <input type="number" id="npp" value="0.55" min="0" step="0.01" data-act="nappy">
+      </label>
+      <div class="nappy-out">= <b id="npweek">$0.00</b> a week</div>
+      <button class="ghost small" data-do="nappy-use">Use this → "Nappies &amp; wipes"</button>
+    </div>
+  </section>
+
+  <section class="card no-print">
+    <h2>🎉 Wins &amp; notes</h2>
+    <div class="notesgrid">
+      <label class="mini" style="flex-direction:column;align-items:stretch;gap:5px">Wins this week
+        <textarea data-act="wins" id="wins" placeholder="Stayed on budget, no takeaways, found a cheaper shop..."></textarea>
+      </label>
+      <label class="mini" style="flex-direction:column;align-items:stretch;gap:5px">Anything to remember
+        <textarea data-act="notes" id="notes" placeholder="Rego due next month, birthday on the 12th..."></textarea>
+      </label>
+    </div>
+  </section>
+
+  <details class="card no-print">
+    <summary><span>⚙️</span><span>Settings &amp; backup</span><span class="caret">▾</span></summary>
+    <div class="setgrid">
+      <label>Money symbol
+        <input type="text" id="currency" data-act="currency" maxlength="4" value="$" style="width:6rem">
+      </label>
+      <label class="switch"><input type="checkbox" id="fun" data-act="fun"> Fun mode (emoji + confetti)</label>
+      <div>
+        <button class="ghost small" data-do="tpl">↺ Reset to starter list</button>
+        <button class="ghost small danger" data-do="blank-week">✕ Blank this week</button>
+      </div>
+    </div>
+    <p class="savestate" id="savestate">Saved in this browser.</p>
+    <p class="hint">This page keeps everything in your own browser — no internet, no sign-up, nobody else can see it.
+      If the print button or file download doesn't work, you're viewing a preview: save this page as a file on your computer and open it there.</p>
+  </details>
+
+  <div class="print-foot print-only">
+    <div class="pf-row">
+      <span>Money in: <b id="p-in">$0.00</b></span>
+      <span>Planned out: <b id="p-out">$0.00</b></span>
+      <span>Spent so far: <b id="p-spent">$0.00</b></span>
+      <span>Left over: <b id="p-left">$0.00</b></span>
+    </div>
+    <div class="pf-lines">
+      Wins this week:
+      <i></i><i></i>
+    </div>
+  </div>
+</main>
+
+<div class="summarybar no-print">
+  <div class="sbar-item"><span>Money in</span><b id="t-in">$0.00</b></div>
+  <div class="sbar-item"><span>Planned out</span><b id="t-out">$0.00</b></div>
+  <div class="sbar-item"><span>Spent so far</span><b id="t-spent">$0.00</b></div>
+  <div class="sbar-item hero"><span>Left over</span><b id="t-left">$0.00</b></div>
+  <div class="barwrap">
+    <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+    <span class="alloc" id="alloc-note">Add your money in first</span>
+    <span class="alloc" id="left-msg"></span>
+  </div>
+  <button class="primary" data-do="done">We're sorted 🎉</button>
+</div>
+
+<div class="overlay" id="picker" hidden>
+  <div class="sheet">
+    <h3 id="picker-title">Pick a picture</h3>
+    <div class="emoji-grid" id="emoji-grid"></div>
+    <div class="row"><button class="ghost" data-do="close-picker">Close</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="backup" hidden>
+  <div class="sheet">
+    <h3>💾 Backup &amp; restore</h3>
+    <p class="hint">Copy this text somewhere safe (email it to yourself, or a notes app). Paste it back here and press "Load this text" to bring your budget back.</p>
+    <textarea id="backup-text" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="primary" data-do="copy-backup">📋 Copy backup text</button>
+      <button class="ghost" data-do="load-backup">⬆️ Load this text</button>
+      <button class="ghost" data-do="download-backup">⬇️ Download file</button>
+      <button class="ghost" data-do="close-backup">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   Family Weekly Budget — all data stays in this browser
+   ============================================================ */
+const KEY = 'family-weekly-budget-v1';
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const EMOJIS = ['🏠','💡','📱','🚌','⛽','💳','🛒','🥡','🧴','🍞','🥦','👶','🍼','🧷','🧸','🎒','🪙','🍭','🧑‍🏫','❤️','🎡','📺','🐶','💊','✂️','🏥','🎂','🎁','🛟','🎯','🏖️','🎮','📚','👕','☕','🚗','💧','🔧','✨','🧹','🍽️','💼','➕','🧾','🎨','⚽','🚲','🐱','🍕','🎧'];
+
+/* ---------- dates ---------- */
+function mondayOf(d){ const x = new Date(d); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day); x.setHours(0,0,0,0); return x; }
+function iso(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function fromISO(s){ return new Date(s + 'T00:00:00'); }
+function shiftISO(s, days){ const d = fromISO(s); d.setDate(d.getDate() + days); return iso(d); }
+function niceDate(s){ return fromISO(s).toLocaleDateString(undefined, {weekday:'short', day:'numeric', month:'short'}); }
+function weekRange(s){ return niceDate(s) + ' – ' + niceDate(shiftISO(s, 6)); }
+function weekTitle(s){
+  const d = fromISO(s), t = mondayOf(new Date());
+  const diff = Math.round((d - t) / 604800000);
+  if (diff === 0) return 'This week (' + niceDate(s) + ')';
+  if (diff === -1) return 'Last week (' + niceDate(s) + ')';
+  if (diff === 1) return 'Next week (' + niceDate(s) + ')';
+  return 'Week of ' + niceDate(s);
+}
+
+/* ---------- starter data ---------- */
+const it = (label, emoji) => ({ id: uid(), label: label, emoji: emoji, planned: '', spent: '', paid: false });
+function defaultGroups(){
+  return [
+    { id: uid(), name: 'Must pay', emoji: '🏠', items: [
+      it('Rent / mortgage', '🏠'), it('Power', '💡'), it('Internet & phones', '📱'),
+      it('Petrol / transport', '🚌'), it('Debt & cards', '💳')
+    ]},
+    { id: uid(), name: 'Food & home', emoji: '🛒', items: [
+      it('Food shopping', '🛒'), it('Takeaways', '🥡'), it('House bits & bobs', '🧴')
+    ]},
+    { id: uid(), name: 'Kids', emoji: '🧸', items: [
+      it('Childcare / daycare', '🧑‍🏫'), it('Nappies & wipes', '👶'),
+      it('School stuff', '🎒'), it('Pocket money (10yo)', '🪙'), it('Kid fun / treats', '🍭')
+    ]},
+    { id: uid(), name: 'Fun & us', emoji: '❤️', items: [
+      it('Date night / us', '❤️'), it('Family day out', '🎡'), it('Subscriptions', '📺')
+    ]},
+    { id: uid(), name: 'Savings', emoji: '🛟', items: [
+      it('Emergency fund', '🛟'), it('Family goal', '🎯')
+    ]}
+  ];
+}
+function newWeek(){
+  return {
+    income: [
+      { id: uid(), label: 'Wages — me', emoji: '💼', amount: '' },
+      { id: uid(), label: 'Wages — partner', emoji: '💼', amount: '' },
+      { id: uid(), label: 'Other money in', emoji: '➕', amount: '' }
+    ],
+    groups: defaultGroups(),
+    goals: [
+      { id: uid(), label: 'Family goal', emoji: '🎯', target: '', saved: '' },
+      { id: uid(), label: 'Emergency fund', emoji: '🛟', target: '', saved: '' }
+    ],
+    jobs: [
+      { id: uid(), label: 'Tidy room', emoji: '🧹', amount: '2', done: false },
+      { id: uid(), label: 'Help with dishes', emoji: '🍽️', amount: '1', done: false },
+      { id: uid(), label: 'Reading time', emoji: '📚', amount: '1', done: false }
+    ],
+    notes: '', wins: ''
+  };
+}
+
+/* ---------- state ---------- */
+let mem = null;
+function freshState(){
+  const wk = iso(mondayOf(new Date()));
+  const s = { settings: { family: '', currency: '$', fun: true }, currentWeek: wk, weeks: {} };
+  s.weeks[wk] = newWeek();
+  return s;
+}
+function normalize(d){
+  if (!d || typeof d !== 'object') return freshState();
+  d.settings = d.settings || {};
+  if (typeof d.settings.family !== 'string') d.settings.family = '';
+  if (!d.settings.currency) d.settings.currency = '$';
+  if (typeof d.settings.fun !== 'boolean') d.settings.fun = true;
+  d.weeks = d.weeks || {};
+  Object.keys(d.weeks).forEach(k => {
+    const w = d.weeks[k]; if (!w) return;
+    w.income = Array.isArray(w.income) ? w.income : [];
+    w.income.forEach(i => { if (!i.id) i.id = uid(); });
+    w.groups = Array.isArray(w.groups) ? w.groups : [];
+    w.groups.forEach(g => {
+      if (!g.id) g.id = uid();
+      g.items = Array.isArray(g.items) ? g.items : [];
+      g.items.forEach(i => { if (!i.id) i.id = uid(); });
+    });
+    w.goals = Array.isArray(w.goals) ? w.goals : [];
+    w.goals.forEach(g => { if (!g.id) g.id = uid(); });
+    w.jobs = Array.isArray(w.jobs) ? w.jobs : [];
+    w.jobs.forEach(j => { if (!j.id) j.id = uid(); });
+    if (typeof w.notes !== 'string') w.notes = '';
+    if (typeof w.wins !== 'string') w.wins = '';
+  });
+  if (!d.currentWeek || !d.weeks[d.currentWeek]) {
+    d.currentWeek = iso(mondayOf(new Date()));
+    if (!d.weeks[d.currentWeek]) d.weeks[d.currentWeek] = newWeek();
+  }
+  return d;
+}
+function load(){
+  let d = null;
+  try { const raw = localStorage.getItem(KEY); if (raw) d = JSON.parse(raw); } catch (e) { d = null; }
+  if (!d) d = mem;
+  if (!d) d = freshState();
+  return normalize(d);
+}
+let state = load();
+function week(){
+  const k = state.currentWeek;
+  if (!state.weeks[k]) state.weeks[k] = newWeek();
+  return state.weeks[k];
+}
+let storageWorks = null;
+function save(){
+  mem = state;
+  try { localStorage.setItem(KEY, JSON.stringify(state)); storageWorks = true; }
+  catch (e) { storageWorks = false; }
+  const el = $('#savestate');
+  if (el) el.textContent = storageWorks === false
+    ? 'Preview mode: changes live in this tab only. Save this page as a file on your computer for auto-saving.'
+    : 'Saved in this browser automatically ✓';
+}
+
+/* ---------- helpers ---------- */
+const money = n => state.settings.currency + num(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function totals(){
+  const w = week();
+  const income = w.income.reduce((s, i) => s + num(i.amount), 0);
+  const planned = w.groups.reduce((s, g) => s + g.items.reduce((t, i) => t + num(i.planned), 0), 0);
+  const spent = w.groups.reduce((s, g) => s + g.items.reduce((t, i) => t + num(i.spent), 0), 0);
+  const jobs = w.jobs.filter(j => j.done).reduce((s, j) => s + num(j.amount), 0);
+  return { income: income, planned: planned, spent: spent, left: income - planned, jobs: jobs };
+}
+function findItem(id){
+  const gs = week().groups;
+  for (let i = 0; i < gs.length; i++){ const f = gs[i].items.find(x => x.id === id); if (f) return f; }
+  return null;
+}
+function groupOfItem(id){
+  const gs = week().groups;
+  for (let i = 0; i < gs.length; i++){ if (gs[i].items.some(x => x.id === id)) return gs[i]; }
+  return null;
+}
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------- render ---------- */
+function renderAll(){
+  $('#family').value = state.settings.family;
+  $('#currency').value = state.settings.currency;
+  $('#fun').checked = !!state.settings.fun;
+  $('#weeklabel').textContent = weekTitle(state.currentWeek);
+
+  $('#income').innerHTML = week().income.map(i => `
+    <div class="item" data-inc="${i.id}">
+      <button class="emo" data-do="emoji" data-kind="income" data-id="${i.id}" title="Change picture">${esc(i.emoji || '💼')}</button>
+      <input class="label" data-act="income-label" data-id="${i.id}" value="${esc(i.label)}" aria-label="Where the money comes from">
+      <div class="nums">
+        <label class="mini">Amount<input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"
+          data-act="income-amount" data-id="${i.id}" value="${i.amount === '' || i.amount == null ? '' : esc(i.amount)}"></label>
+        <button class="del" data-do="del-income" data-id="${i.id}" title="Remove">✕</button>
+      </div>
+    </div>`).join('');
+
+  $('#groups').innerHTML = week().groups.map(groupHTML).join('');
+  $('#goals').innerHTML = week().goals.map(goalHTML).join('');
+  $('#jobs').innerHTML = week().jobs.map(jobHTML).join('');
+
+  $('#wins').value = week().wins;
+  $('#notes').value = week().notes;
+
+  $('#p-title').textContent = (state.settings.family ? state.settings.family + ' — ' : 'Our family — ') + 'Weekly budget';
+  $('#p-week').textContent = 'Week: ' + weekRange(state.currentWeek);
+  update();
+  save();
+}
+function groupHTML(g){
+  const gt = g.items.reduce((s, i) => s + num(i.planned), 0);
+  const gs = g.items.reduce((s, i) => s + num(i.spent), 0);
+  return `<details class="card group" open data-gid="${g.id}">
+    <summary class="ghead">
+      <button class="emo" data-do="emoji" data-kind="group" data-id="${g.id}" title="Change picture">${esc(g.emoji || '📦')}</button>
+      <input class="gname" data-act="group-name" data-id="${g.id}" value="${esc(g.name)}" aria-label="Group name">
+      <span class="gsum"><b class="g-total">${money(gt)}</b><span class="g-spent">spent ${money(gs)}</span></span>
+      <span class="caret">▾</span>
+    </summary>
+    <div class="items">${g.items.map(itemHTML).join('')}</div>
+    <div class="row-end">
+      <button class="ghost small" data-do="add-item" data-id="${g.id}">+ Add a line</button>
+      <span class="spacer"></span>
+      <button class="ghost small danger" data-do="del-group" data-id="${g.id}">Delete group</button>
+    </div>
+  </details>`;
+}
+function itemHTML(i){
+  return `<div class="item${i.paid ? ' paid' : ''}" data-iid="${i.id}">
+    <button class="emo" data-do="emoji" data-kind="item" data-id="${i.id}" title="Change picture">${esc(i.emoji || '🧾')}</button>
+    <input class="label" data-act="label" data-id="${i.id}" value="${esc(i.label)}" aria-label="What is it">
+    <div class="nums">
+      <label class="mini">Plan<input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"
+        data-act="planned" data-id="${i.id}" value="${i.planned === '' || i.planned == null ? '' : esc(i.planned)}"></label>
+      <label class="mini">Spent<input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"
+        data-act="spent" data-id="${i.id}" value="${i.spent === '' || i.spent == null ? '' : esc(i.spent)}"></label>
+      <button class="tick" data-do="paid" data-id="${i.id}" title="Mark as paid" aria-pressed="${i.paid ? 'true' : 'false'}">${i.paid ? '✓' : '○'}</button>
+      <button class="del" data-do="del-item" data-id="${i.id}" title="Remove">✕</button>
+    </div>
+    <span class="prtick print-only">${i.paid ? '☑' : '☐'}</span>
+  </div>`;
+}
+function goalHTML(g){
+  const t = num(g.target), s = num(g.saved);
+  const pct = t > 0 ? Math.min(100, Math.round(s / t * 100)) : 0;
+  return `<div class="mini-row" data-goalid="${g.id}">
+    <button class="emo" data-do="emoji" data-kind="goal" data-id="${g.id}" title="Change picture">${esc(g.emoji || '🎯')}</button>
+    <div>
+      <input class="label" style="border-color:transparent;background:transparent;font-weight:700;width:100%"
+        data-act="goal-label" data-id="${g.id}" value="${esc(g.label)}" aria-label="Goal name">
+      <div class="goal-bar"><i style="width:${pct}%"></i></div>
+      <div class="goal-note">${money(s)} of ${t > 0 ? money(t) : '—'} ${t > 0 ? '(' + pct + '%)' : ''}</div>
+    </div>
+    <label class="mini">Saved<input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"
+      data-act="goal-saved" data-id="${g.id}" value="${g.saved === '' || g.saved == null ? '' : esc(g.saved)}"></label>
+    <button class="del" data-do="del-goal" data-id="${g.id}" title="Remove">✕</button>
+  </div>`;
+}
+function jobHTML(j){
+  return `<div class="mini-row" data-jobid="${j.id}" style="${j.done ? 'background:#f0fbf6;border-color:#c9ecdd' : ''}">
+    <button class="emo" data-do="emoji" data-kind="job" data-id="${j.id}" title="Change picture">${esc(j.emoji || '⭐')}</button>
+    <input class="label" style="border-color:transparent;background:transparent;font-weight:600;width:100%"
+      data-act="job-label" data-id="${j.id}" value="${esc(j.label)}" aria-label="Job">
+    <label class="mini">Pays<input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"
+      data-act="job-amount" data-id="${j.id}" value="${j.amount === '' || j.amount == null ? '' : esc(j.amount)}"></label>
+    <button class="tick" data-do="job-done" data-id="${j.id}" title="Done!" style="${j.done ? 'background:#dff5ea;color:#0f8a63;border-color:#bfe8d6' : ''}">${j.done ? '✓' : '○'}</button>
+  </div>`;
+}
+
+/* ---------- light updates (keeps your typing in place) ---------- */
+function update(){
+  const t = totals();
+  $('#t-in').textContent = money(t.income);
+  $('#t-out').textContent = money(t.planned);
+  $('#t-spent').textContent = money(t.spent);
+  const left = $('#t-left');
+  left.textContent = money(t.left);
+  left.classList.toggle('good', t.left >= 0);
+  left.classList.toggle('bad', t.left < 0);
+
+  const pct = t.income > 0 ? Math.min(100, Math.round(t.planned / t.income * 100)) : 0;
+  const fill = $('#bar-fill');
+  fill.style.width = pct + '%';
+  fill.style.background = t.left < 0
+    ? 'linear-gradient(90deg,#f6b3b0,#d64540)'
+    : 'linear-gradient(90deg,#7be0c8,#12a594)';
+  $('#alloc-note').textContent = t.income > 0 ? pct + '% of your money is planned' : 'Add your money in first';
+  $('#left-msg').textContent = msgFor(t);
+
+  $('#inc-total').textContent = money(t.income);
+  $('#p-in').textContent = money(t.income);
+  $('#p-out').textContent = money(t.planned);
+  $('#p-spent').textContent = money(t.spent);
+  $('#p-left').textContent = money(t.left);
+
+  week().groups.forEach(g => {
+    const card = $('#groups details[data-gid="' + g.id + '"]'); if (!card) return;
+    const gt = g.items.reduce((s, i) => s + num(i.planned), 0);
+    const gs = g.items.reduce((s, i) => s + num(i.spent), 0);
+    const a = card.querySelector('.g-total'); if (a) a.textContent = money(gt);
+    const b = card.querySelector('.g-spent'); if (b) b.textContent = 'spent ' + money(gs);
+    card.classList.toggle('over', gt > 0 && gs > gt);
+  });
+  week().groups.forEach(g => g.items.forEach(i => {
+    const row = $('.item[data-iid="' + i.id + '"]'); if (!row) return;
+    const over = num(i.planned) > 0 && num(i.spent) > num(i.planned);
+    row.classList.toggle('paid', !!i.paid);
+    row.classList.toggle('over', over && !i.paid);
+    const tk = row.querySelector('.tick');
+    if (tk){ tk.textContent = i.paid ? '✓' : '○'; tk.setAttribute('aria-pressed', i.paid ? 'true' : 'false'); }
+    const pt = row.querySelector('.prtick'); if (pt) pt.textContent = i.paid ? '☑' : '☐';
+  }));
+  week().goals.forEach(g => {
+    const row = $('.mini-row[data-goalid="' + g.id + '"]'); if (!row) return;
+    const tgt = num(g.target), sv = num(g.saved);
+    const p = tgt > 0 ? Math.min(100, Math.round(sv / tgt * 100)) : 0;
+    row.querySelector('.goal-bar > i').style.width = p + '%';
+    row.querySelector('.goal-note').textContent = money(sv) + ' of ' + (tgt > 0 ? money(tgt) : '—') + (tgt > 0 ? ' (' + p + '%)' : '');
+  });
+  $('#job-total').textContent = money(t.jobs);
+  nappyCalc();
+}
+function msgFor(t){
+  if (t.income <= 0 && t.planned <= 0) return 'Pop your money in to start ✨';
+  if (t.income <= 0) return 'Add your money in to see what\'s left ✨';
+  if (t.left < 0) return 'You\'re ' + money(-t.left) + ' over — trim something or add money in 💛';
+  if (t.left === 0) return 'Every dollar has a job. Neat! 🎉';
+  return 'You\'ve got ' + money(t.left) + ' spare — pop some in savings? 🏦';
+}
+
+/* ---------- confetti ---------- */
+function celebrate(){
+  if (!state.settings.fun) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cols = ['#12a594','#ef6f6c','#f2a541','#7c6cff','#33c1ff','#7be0c8'];
+  for (let i = 0; i < 60; i++){
+    const d = document.createElement('div');
+    d.className = 'confetti';
+    d.style.left = (Math.random() * 100) + 'vw';
+    d.style.background = cols[i % cols.length];
+    d.style.animationDelay = (Math.random() * 0.45) + 's';
+    if (i % 3 === 0) d.style.borderRadius = '50%';
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 2900);
+  }
+}
+
+/* ---------- baby maths ---------- */
+function nappyCalc(){
+  const perDay = num($('#npd').value), each = num($('#npp').value);
+  $('#npweek').textContent = money(perDay * each * 7);
+}
+
+/* ---------- emoji picker ---------- */
+let pickTarget = null;
+function openPicker(kind, id){
+  pickTarget = { kind: kind, id: id };
+  const grid = $('#emoji-grid');
+  if (!grid.dataset.built){
+    grid.innerHTML = EMOJIS.map(e => `<button data-do="pick-emoji" data-e="${e}" aria-label="emoji">${e}</button>`).join('');
+    grid.dataset.built = '1';
+  }
+  $('#picker-title').textContent = 'Pick a picture';
+  $('#picker').hidden = false;
+}
+function pickEmoji(e){
+  if (!pickTarget) return;
+  const w = week();
+  let obj = null;
+  if (pickTarget.kind === 'income') obj = w.income.find(x => x.id === pickTarget.id);
+  else if (pickTarget.kind === 'item') obj = findItem(pickTarget.id);
+  else if (pickTarget.kind === 'group') obj = w.groups.find(x => x.id === pickTarget.id);
+  else if (pickTarget.kind === 'goal') obj = w.goals.find(x => x.id === pickTarget.id);
+  else if (pickTarget.kind === 'job') obj = w.jobs.find(x => x.id === pickTarget.id);
+  if (obj){
+    obj.emoji = e;
+    const btn = document.querySelector('[data-do="emoji"][data-id="' + pickTarget.id + '"]');
+    if (btn){ btn.textContent = e; }
+    save();
+  }
+  $('#picker').hidden = true;
+  pickTarget = null;
+}
+
+/* ---------- backup ---------- */
+function backupJSON(){ return JSON.stringify(state, null, 2); }
+function copyText(text){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => toast('Copied ✓')).catch(() => fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  ta.remove();
+  toast(ok ? 'Copied ✓' : 'Copy didn\'t work — select the text and copy it manually');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('input', e => {
+  const t = e.target, act = t.dataset.act;
+  if (!act) return;
+  const w = week();
+
+  if (act === 'family'){ state.settings.family = t.value; $('#p-title').textContent = (t.value ? t.value + ' — ' : 'Our family — ') + 'Weekly budget'; save(); return; }
+  if (act === 'currency'){ state.settings.currency = t.value || '$'; save(); renderAll(); return; }
+  if (act === 'fun'){ state.settings.fun = t.checked; save(); if (t.checked) toast('Fun mode on! 🎉'); return; }
+  if (act === 'nappy'){ nappyCalc(); return; }
+  if (act === 'wins'){ w.wins = t.value; save(); return; }
+  if (act === 'notes'){ w.notes = t.value; save(); return; }
+  if (act === 'group-name'){ const g = w.groups.find(x => x.id === t.dataset.id); if (g){ g.name = t.value; save(); } return; }
+  if (act === 'label'){ const i = findItem(t.dataset.id); if (i){ i.label = t.value; save(); } return; }
+  if (act === 'planned'){ const i = findItem(t.dataset.id); if (i){ i.planned = t.value; save(); update(); } return; }
+  if (act === 'spent'){ const i = findItem(t.dataset.id); if (i){ i.spent = t.value; save(); update(); } return; }
+  if (act === 'income-label'){ const i = w.income.find(x => x.id === t.dataset.id); if (i){ i.label = t.value; save(); } return; }
+  if (act === 'income-amount'){ const i = w.income.find(x => x.id === t.dataset.id); if (i){ i.amount = t.value; save(); update(); } return; }
+  if (act === 'goal-label'){ const g = w.goals.find(x => x.id === t.dataset.id); if (g){ g.label = t.value; save(); } return; }
+  if (act === 'goal-saved'){ const g = w.goals.find(x => x.id === t.dataset.id); if (g){ g.saved = t.value; save(); update(); } return; }
+  if (act === 'job-label'){ const j = w.jobs.find(x => x.id === t.dataset.id); if (j){ j.label = t.value; save(); } return; }
+  if (act === 'job-amount'){ const j = w.jobs.find(x => x.id === t.dataset.id); if (j){ j.amount = t.value; save(); update(); } return; }
+});
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-do]');
+  if (!btn) return;
+  const act = btn.dataset.do, id = btn.dataset.id;
+  const w = week();
+  if (btn.closest('summary')) e.preventDefault();
+
+  switch (act){
+    case 'prev': case 'next': {
+      state.currentWeek = shiftISO(state.currentWeek, act === 'prev' ? -7 : 7);
+      if (!state.weeks[state.currentWeek]) state.weeks[state.currentWeek] = newWeek();
+      renderAll(); break;
+    }
+    case 'today': state.currentWeek = iso(mondayOf(new Date()));
+      if (!state.weeks[state.currentWeek]) state.weeks[state.currentWeek] = newWeek();
+      renderAll(); break;
+
+    case 'add-income': w.income.push({ id: uid(), label: 'Money in', emoji: '➕', amount: '' }); renderAll(); break;
+    case 'del-income': w.income = w.income.filter(x => x.id !== id); renderAll(); break;
+
+    case 'add-group': w.groups.push({ id: uid(), name: 'New group', emoji: '📦', items: [it('New line', '🧾')] }); renderAll(); break;
+    case 'del-group': {
+      const g = w.groups.find(x => x.id === id);
+      if (g && confirm('Delete the whole "' + g.name + '" group?')) { w.groups = w.groups.filter(x => x.id !== id); renderAll(); }
+      break;
+    }
+    case 'add-item': { const g = w.groups.find(x => x.id === id); if (g){ g.items.push(it('New line', '🧾')); renderAll(); } break; }
+    case 'del-item': { const g = groupOfItem(id); if (g){ g.items = g.items.filter(x => x.id !== id); renderAll(); } break; }
+    case 'paid': { const i = findItem(id); if (i){ i.paid = !i.paid; if (i.paid && !i.spent) i.spent = i.planned; update(); save(); if (i.paid && state.settings.fun) toast('Tick! One less thing to think about ✓'); } break; }
+
+    case 'add-goal': w.goals.push({ id: uid(), label: 'New goal', emoji: '🎯', target: '', saved: '' }); renderAll(); break;
+    case 'del-goal': w.goals = w.goals.filter(x => x.id !== id); renderAll(); break;
+
+    case 'add-job': w.jobs.push({ id: uid(), label: 'New job', emoji: '⭐', amount: '', done: false }); renderAll(); break;
+    case 'job-done': { const j = w.jobs.find(x => x.id === id); if (j){ j.done = !j.done; renderAll(); } break; }
+    case 'del-job': w.jobs = w.jobs.filter(x => x.id !== id); renderAll(); break;
+
+    case 'emoji': openPicker(btn.dataset.kind, id); break;
+    case 'close-picker': $('#picker').hidden = true; pickTarget = null; break;
+    case 'pick-emoji': pickEmoji(btn.dataset.e); break;
+
+    case 'nappy-use': {
+      const perDay = num($('#npd').value), each = num($('#npp').value);
+      const val = (Math.round(perDay * each * 7 * 100) / 100).toString();
+      let target = null;
+      w.groups.forEach(g => g.items.forEach(i => { if (/napp|wipe|diaper/i.test(i.label) && !target) target = i; }));
+      if (!target){
+        let kids = w.groups.find(g => /kid/i.test(g.name));
+        if (!kids){ kids = { id: uid(), name: 'Kids', emoji: '🧸', items: [] }; w.groups.push(kids); }
+        kids.items.push(it('Nappies & wipes', '👶'));
+        target = kids.items[kids.items.length - 1];
+      }
+      target.planned = val;
+      renderAll();
+      toast('Nappies set to ' + money(val) + ' a week 👶');
+      break;
+    }
+
+    case 'copy-last': {
+      const prevKey = shiftISO(state.currentWeek, -7);
+      if (!state.weeks[prevKey]){ toast('There\'s no saved week before this one yet'); break; }
+      const prev = state.weeks[prevKey], cur = week();
+      prev.groups.forEach(pg => {
+        let g = cur.groups.find(x => x.name.toLowerCase() === pg.name.toLowerCase());
+        if (!g){ g = { id: uid(), name: pg.name, emoji: pg.emoji, items: [] }; cur.groups.push(g); }
+        pg.items.forEach(pi => {
+          let i = g.items.find(x => x.label.toLowerCase() === pi.label.toLowerCase());
+          if (!i){ i = it(pi.label, pi.emoji); g.items.push(i); }
+          i.planned = pi.planned; i.spent = ''; i.paid = false;
+        });
+      });
+      cur.income.forEach((inc, idx) => { if (prev.income[idx]) inc.amount = prev.income[idx].amount; });
+      renderAll();
+      toast('Copied last week\'s plan — tweak what\'s different ✏️');
+      break;
+    }
+
+    case 'tpl': {
+      if (!confirm('Replace this week\'s groups with the starter list? Your own lines in this week will be lost.')) break;
+      week().groups = defaultGroups(); renderAll(); toast('Starter list loaded'); break;
+    }
+    case 'blank-week': {
+      if (!confirm('Clear everything for this week and start fresh?')) break;
+      state.weeks[state.currentWeek] = newWeek(); renderAll(); toast('Fresh week, clean slate ✨'); break;
+    }
+
+    case 'done': {
+      const t = totals();
+      celebrate();
+      const msgs = t.left >= 0
+        ? ['Sorted! 🎉', 'Budget boss! 🏆', 'That\'s the week planned ✨', 'Go team! 🎉']
+        : ['Almost — a little over. You\'ve got this 💛', 'Nothing\'s broken, just tweak one thing 💛'];
+      toast(msgs[Math.floor(Math.random() * msgs.length)]);
+      break;
+    }
+
+    case 'print': {
+      const ds = $$('details');
+      ds.forEach(d => { d.dataset.was = d.open ? '1' : '0'; d.open = true; });
+      try { window.print(); } catch (err) { toast('Printing is blocked here — save the file to your computer and print from there'); }
+      setTimeout(() => ds.forEach(d => { if (d.dataset.was === '0') d.open = false; }), 800);
+      break;
+    }
+
+    case 'backup': $('#backup-text').value = backupJSON(); $('#backup').hidden = false; break;
+    case 'close-backup': $('#backup').hidden = true; break;
+    case 'copy-backup': copyText($('#backup-text').value); break;
+    case 'load-backup': {
+      try {
+        const parsed = JSON.parse($('#backup-text').value);
+        state = normalize(parsed);
+        $('#backup').hidden = true;
+        renderAll();
+        toast('Backup loaded ✓');
+      } catch (err) { toast('That text didn\'t load — make sure you pasted the whole thing'); }
+      break;
+    }
+    case 'download-backup': {
+      const name = (state.settings.family ? state.settings.family.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '-' : '') + 'family-budget-backup.json';
+      let ok = false;
+      try {
+        const blob = new Blob([backupJSON()], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        ok = true;
+      } catch (err) { ok = false; }
+      toast(ok ? 'Saved a backup file ⬇️' : 'Downloads are blocked in this preview — copy the text instead');
+      break;
+    }
+  }
+});
+
+/* keep native details clicks working elsewhere, close modals on backdrop click */
+$('#picker').addEventListener('click', e => { if (e.target.id === 'picker'){ $('#picker').hidden = true; pickTarget = null; } });
+$('#backup').addEventListener('click', e => { if (e.target.id === 'backup') $('#backup').hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ $('#picker').hidden = true; $('#backup').hidden = true; pickTarget = null; } });
+
+/* ---------- go ---------- */
+renderAll();
+save();
+</script>
+</body>
+</html>
