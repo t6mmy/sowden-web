@@ -8,8 +8,20 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const RESEND_FROM = 'onboarding@resend.dev';
 
-function buildPassword(version) {
-  return `sowden-${String(version).padStart(3, '0')}`;
+const WORD_LIST = [
+  'aurora', 'breeze', 'crystal', 'dream', 'echo', 'forest', 'garden', 'harmony',
+  'island', 'journey', 'kingdom', 'light', 'mountain', 'night', 'ocean', 'peace',
+  'quest', 'river', 'silver', 'thunder', 'unity', 'valley', 'wonder', 'zenith',
+  'amber', 'blaze', 'cosmic', 'dazzle', 'eternal', 'flame', 'gentle', 'hidden',
+  'icy', 'jade', 'keen', 'lunar', 'magic', 'nebula', 'orbit', 'pearl',
+  'quiet', 'radiant', 'serene', 'twilight', 'unique', 'vivid', 'whisper', 'zenlike'
+];
+
+function generateRandomPassword() {
+  const word1 = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+  const word2 = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+  const word3 = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+  return `${word1}-${word2}-${word3}`;
 }
 
 async function fetchJSON(url, options = {}) {
@@ -48,14 +60,14 @@ async function writePasswordState(state) {
   });
 }
 
-async function sendPasswordEmail(newPassword, version) {
+async function sendPasswordEmail(newPassword) {
   if (!RESEND_API_KEY || ADMIN_EMAILS.length === 0) {
     return;
   }
 
   const recipients = ADMIN_EMAILS;
-  const subject = `New Sowden password (${version})`;
-  const message = `Your password for the family site has been updated.\n\nPassword: ${newPassword}\n\nThis password will stay active for 7 days.\n\nIf you did not expect this email, please ignore it.`;
+  const subject = `New Sowden Family Site Password`;
+  const message = `Your password for the Sowden family site has been updated.\n\nPassword: ${newPassword}\n\nThis password will be active for 7 days, then a new one will be sent.\n\nIf you did not expect this email, please ignore it.`;
 
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -73,10 +85,11 @@ async function sendPasswordEmail(newPassword, version) {
 }
 
 function getDefaultState() {
+  const initialPassword = generateRandomPassword();
   return {
-    currentPassword: 'sowden-001',
-    version: 1,
+    currentPassword: initialPassword,
     lastUpdated: Date.now(),
+    emailSent: false,
     previousPasswords: [],
   };
 }
@@ -122,19 +135,21 @@ exports.handler = async function handler(event) {
     if (!state || typeof state !== 'object') {
       state = getDefaultState();
       await writePasswordState(state);
+      // Send initial email
+      await sendPasswordEmail(state.currentPassword).catch(() => {});
     }
 
     const now = Date.now();
     const lastUpdated = Number(state.lastUpdated || now);
 
+    // Check if 7 days have passed
     if (now - lastUpdated >= SEVEN_DAYS_MS) {
-      const nextVersion = Number(state.version || 0) + 1;
-      const nextPassword = buildPassword(nextVersion);
+      const nextPassword = generateRandomPassword();
 
       state = {
         currentPassword: nextPassword,
-        version: nextVersion,
         lastUpdated: now,
+        emailSent: false,
         previousPasswords: [
           ...(Array.isArray(state.previousPasswords) ? state.previousPasswords : []),
           String(state.currentPassword || '').trim(),
@@ -142,7 +157,7 @@ exports.handler = async function handler(event) {
       };
 
       await writePasswordState(state);
-      await sendPasswordEmail(nextPassword, nextVersion).catch(() => {});
+      await sendPasswordEmail(nextPassword).catch(() => {});
     }
 
     const success = submittedPassword === state.currentPassword;
