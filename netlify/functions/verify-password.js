@@ -152,14 +152,15 @@ exports.handler = async function handler(event) {
     const now = Date.now();
     const lastUpdated = Number(state.lastUpdated || now);
 
-    // Check if 7 days have passed
+// Check if 7 days have passed
     if (now - lastUpdated >= SEVEN_DAYS_MS) {
+      const nextVersion = Number(state.version || 0) + 1;
       const nextPassword = generateRandomPassword();
 
       state = {
         currentPassword: nextPassword,
+        version: nextVersion,
         lastUpdated: now,
-        emailSent: false,
         previousPasswords: [
           ...(Array.isArray(state.previousPasswords) ? state.previousPasswords : []),
           String(state.currentPassword || '').trim(),
@@ -167,7 +168,7 @@ exports.handler = async function handler(event) {
       };
 
       await writePasswordState(state);
-      await sendPasswordEmail(nextPassword).catch(() => {});
+      await sendPasswordEmail(nextPassword, nextVersion).catch((err) => console.log('Email fetch crashed:', err));
     }
 
     const success = submittedPassword === state.currentPassword;
