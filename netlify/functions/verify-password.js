@@ -60,28 +60,38 @@ async function writePasswordState(state) {
   });
 }
 
-async function sendPasswordEmail(newPassword) {
+async function sendPasswordEmail(newPassword, version) {
+  console.log('--- Email Check Started ---');
+  console.log('API Key exists?', !!RESEND_API_KEY);
+  console.log('Admin Emails:', ADMIN_EMAILS);
+
   if (!RESEND_API_KEY || ADMIN_EMAILS.length === 0) {
+    console.log('Email aborted: Missing API key or admin emails');
     return;
   }
 
-  const recipients = ADMIN_EMAILS;
-  const subject = `New Sowden Family Site Password`;
-  const message = `Your password for the Sowden family site has been updated.\n\nPassword: ${newPassword}\n\nThis password will be active for 7 days, then a new one will be sent.\n\nIf you did not expect this email, please ignore it.`;
+  const subject = `New Sowden password`;
+  const message = `Your password for the family site has been updated.\n\nPassword: ${newPassword}\n\nThis password will stay active for 7 days.\n\nIf you did not expect this email, please ignore it.`;
 
-  await fetch('https://api.resend.com/emails', {
+  console.log('Attempting to send via Resend...');
+
+  const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: RESEND_FROM,
-      to: recipients,
+      from: 'onboarding@resend.dev',
+      to: ADMIN_EMAILS,
       subject,
       text: message,
     }),
   });
+
+  const responseText = await response.text();
+  console.log('Resend Response Status:', response.status);
+  console.log('Resend Response Body:', responseText);
 }
 
 function getDefaultState() {
