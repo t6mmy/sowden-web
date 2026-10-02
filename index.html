@@ -158,10 +158,7 @@
     <p class="more">More links coming soon.</p>
   </main>
 
-  <script>
-    // Set your password here
-    const CORRECT_PASSWORD = 'sowden';
-
+<script>
     const passwordScreen = document.getElementById('passwordScreen');
     const mainContent = document.getElementById('mainContent');
     const passwordInput = document.getElementById('passwordInput');
@@ -183,18 +180,43 @@
       passwordInput.value = '';
     }
 
-    function checkPassword() {
+    async function checkPassword() {
       const input = passwordInput.value.trim();
       errorMsg.textContent = '';
       passwordForm.classList.remove('error');
 
-      if (input === CORRECT_PASSWORD) {
-        grantAccess();
-      } else {
-        errorMsg.textContent = 'Incorrect password';
+      if (!input) return;
+
+      passwordBtn.textContent = 'Checking...';
+      passwordBtn.disabled = true;
+
+      try {
+        // This makes the call to your secure Netlify backend
+        const response = await fetch('/.netlify/functions/verify-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password: input })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          grantAccess();
+        } else {
+          // Displays the error message returned from the backend
+          errorMsg.textContent = data.message || 'Incorrect password';
+          passwordForm.classList.add('error');
+          passwordInput.value = '';
+          passwordInput.focus();
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Server connection failed';
         passwordForm.classList.add('error');
-        passwordInput.value = '';
-        passwordInput.focus();
+      } finally {
+        passwordBtn.textContent = 'Unlock';
+        passwordBtn.disabled = false;
       }
     }
 
